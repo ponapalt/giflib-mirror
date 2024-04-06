@@ -401,7 +401,7 @@ int DGifGetImageHeader(GifFileType *GifFile) {
 		}
 
 		/* Get the image local color map: */
-		for (i = 0; i < GifFile->Image.ColorMap->ColorCount; i++) {
+		for (i = 0; i < (unsigned int)GifFile->Image.ColorMap->ColorCount; i++) {
 			/* coverity[check_return] */
 			if (InternalRead(GifFile, Buf, 3) != 3) {
 				GifFreeMapObject(GifFile->Image.ColorMap);
@@ -1151,13 +1151,15 @@ static int DGifBufferedInput(GifFileType *GifFile, GifByteType *Buf,
  SavedImages may point to the spoilt image and null pointer buffers.
 *******************************************************************************/
 void DGifDecreaseImageCounter(GifFileType *GifFile) {
+	SavedImage *correct_saved_images;
+
 	GifFile->ImageCount--;
 	if (GifFile->SavedImages[GifFile->ImageCount].RasterBits != NULL) {
 		free(GifFile->SavedImages[GifFile->ImageCount].RasterBits);
 	}
 
 	// Realloc array according to the new image counter.
-	SavedImage *correct_saved_images = (SavedImage *)reallocarray(
+	correct_saved_images = (SavedImage *)reallocarray(
 	    GifFile->SavedImages, GifFile->ImageCount, sizeof(SavedImage));
 	if (correct_saved_images != NULL) {
 		GifFile->SavedImages = correct_saved_images;
