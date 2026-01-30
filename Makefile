@@ -175,7 +175,7 @@ uninstall-man:
 # We include all of the XML, and also generated manual pages
 # so people working from the distribution tarball won't need xmlto.
 
-EXTRAS =     README \
+EXTRAS =     README.adoc \
 	     NEWS \
 	     TODO \
 	     COPYING \
