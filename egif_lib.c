@@ -690,6 +690,9 @@ int EGifGCBToSavedExtension(const GraphicsControlBlock *GCB,
 		ExtensionBlock *ep =
 		    &GifFile->SavedImages[ImageIndex].ExtensionBlocks[i];
 		if (ep->Function == GRAPHICS_EXT_FUNC_CODE) {
+			if (ep->ByteCount < 4) {
+				return GIF_ERROR;
+			}
 			EGifGCBToExtension(GCB, ep->Bytes);
 			return GIF_OK;
 		}
