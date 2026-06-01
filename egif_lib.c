@@ -448,7 +448,8 @@ int EGifPutImageDesc(GifFileType *GifFile, const int Left, const int Top,
 
 	/* Mark this file as has screen descriptor: */
 	Private->FileState |= FILE_STATE_IMAGE;
-	Private->PixelCount = (long)Width * (long)Height;
+	Private->PixelCount =
+	    (unsigned long)Width * (unsigned long)Height;
 
 	/* Reset compress algorithm parameters. */
 	(void)EGifSetupCompress(GifFile);
@@ -1154,7 +1155,7 @@ int EGifSpew(GifFileType *GifFileOut, int *ErrorCode) {
 				     j += InterlacedJumps[k]) {
 					if (EGifPutLine(
 					        GifFileOut,
-					        sp->RasterBits + j * SavedWidth,
+					        sp->RasterBits + (size_t)j * SavedWidth,
 					        SavedWidth) == GIF_ERROR) {
 						status = GIF_ERROR;
 						err = GifFileOut->Error;
@@ -1165,7 +1166,7 @@ int EGifSpew(GifFileType *GifFileOut, int *ErrorCode) {
 		} else {
 			for (j = 0; j < SavedHeight; j++) {
 				if (EGifPutLine(GifFileOut,
-				                sp->RasterBits + j * SavedWidth,
+				                sp->RasterBits + (size_t)j * SavedWidth,
 				                SavedWidth) == GIF_ERROR) {
 					status = GIF_ERROR;
 					err = GifFileOut->Error;

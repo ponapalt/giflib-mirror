@@ -71,10 +71,17 @@ int GifQuantizeBuffer(unsigned int Width, unsigned int Height,
 	long Red, Green, Blue;
 	NewColorMapType NewColorSubdiv[256];
 	QuantizedColorType *ColorArrayEntries, *QuantizedColor;
+	size_t k, PixelCount;
 
 	ColorArrayEntries = (QuantizedColorType *)malloc(
 	    sizeof(QuantizedColorType) * COLOR_ARRAY_SIZE);
 	if (ColorArrayEntries == NULL) {
+		return GIF_ERROR;
+	}
+
+	PixelCount = (size_t)Width * Height;
+	if (Width != 0 && PixelCount / Width != Height) {
+		free((char *)ColorArrayEntries);
 		return GIF_ERROR;
 	}
 
@@ -87,12 +94,12 @@ int GifQuantizeBuffer(unsigned int Width, unsigned int Height,
 	}
 
 	/* Sample the colors and their distribution: */
-	for (i = 0; i < (int)(Width * Height); i++) {
-		Index = ((RedInput[i] >> (8 - BITS_PER_PRIM_COLOR))
+	for (k = 0; k < PixelCount; k++) {
+		Index = ((RedInput[k] >> (8 - BITS_PER_PRIM_COLOR))
 		         << (2 * BITS_PER_PRIM_COLOR)) +
-		        ((GreenInput[i] >> (8 - BITS_PER_PRIM_COLOR))
+		        ((GreenInput[k] >> (8 - BITS_PER_PRIM_COLOR))
 		         << BITS_PER_PRIM_COLOR) +
-		        (BlueInput[i] >> (8 - BITS_PER_PRIM_COLOR));
+		        (BlueInput[k] >> (8 - BITS_PER_PRIM_COLOR));
 		ColorArrayEntries[Index].Count++;
 	}
 
@@ -127,7 +134,7 @@ int GifQuantizeBuffer(unsigned int Width, unsigned int Height,
 
 	NewColorSubdiv[0].NumEntries =
 	    NumOfEntries; /* Different sampled colors */
-	NewColorSubdiv[0].Count = ((long)Width) * Height; /* Pixels */
+	NewColorSubdiv[0].Count = (unsigned long)PixelCount; /* Pixels */
 	NewColorMapSize = 1;
 	if (SubdivColorMap(NewColorSubdiv, *ColorMapSize, &NewColorMapSize) !=
 	    GIF_OK) {
@@ -167,28 +174,28 @@ int GifQuantizeBuffer(unsigned int Width, unsigned int Height,
 	/* Finally scan the input buffer again and put the mapped index in the
 	 * output buffer.  */
 	MaxRGBError[0] = MaxRGBError[1] = MaxRGBError[2] = 0;
-	for (i = 0; i < (int)(Width * Height); i++) {
-		Index = ((RedInput[i] >> (8 - BITS_PER_PRIM_COLOR))
+	for (k = 0; k < PixelCount; k++) {
+		Index = ((RedInput[k] >> (8 - BITS_PER_PRIM_COLOR))
 		         << (2 * BITS_PER_PRIM_COLOR)) +
-		        ((GreenInput[i] >> (8 - BITS_PER_PRIM_COLOR))
+		        ((GreenInput[k] >> (8 - BITS_PER_PRIM_COLOR))
 		         << BITS_PER_PRIM_COLOR) +
-		        (BlueInput[i] >> (8 - BITS_PER_PRIM_COLOR));
+		        (BlueInput[k] >> (8 - BITS_PER_PRIM_COLOR));
 		Index = ColorArrayEntries[Index].NewColorIndex;
-		OutputBuffer[i] = Index;
+		OutputBuffer[k] = Index;
 		if (MaxRGBError[0] <
-		    ABS(OutputColorMap[Index].Red - RedInput[i])) {
+		    ABS(OutputColorMap[Index].Red - RedInput[k])) {
 			MaxRGBError[0] =
-			    ABS(OutputColorMap[Index].Red - RedInput[i]);
+			    ABS(OutputColorMap[Index].Red - RedInput[k]);
 		}
 		if (MaxRGBError[1] <
-		    ABS(OutputColorMap[Index].Green - GreenInput[i])) {
+		    ABS(OutputColorMap[Index].Green - GreenInput[k])) {
 			MaxRGBError[1] =
-			    ABS(OutputColorMap[Index].Green - GreenInput[i]);
+			    ABS(OutputColorMap[Index].Green - GreenInput[k]);
 		}
 		if (MaxRGBError[2] <
-		    ABS(OutputColorMap[Index].Blue - BlueInput[i])) {
+		    ABS(OutputColorMap[Index].Blue - BlueInput[k])) {
 			MaxRGBError[2] =
-			    ABS(OutputColorMap[Index].Blue - BlueInput[i]);
+			    ABS(OutputColorMap[Index].Blue - BlueInput[k]);
 		}
 	}
 

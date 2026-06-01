@@ -210,9 +210,9 @@ ColorMapObject *GifUnionColorMap(const ColorMapObject *ColorIn1,
  Apply a given color translation to the raster bits of an image
 *******************************************************************************/
 void GifApplyTranslation(SavedImage *Image, const GifPixelType Translation[]) {
-	register int i;
-	register int RasterSize =
-	    Image->ImageDesc.Height * Image->ImageDesc.Width;
+	size_t i;
+	size_t RasterSize =
+	    (size_t)Image->ImageDesc.Height * Image->ImageDesc.Width;
 
 	for (i = 0; i < RasterSize; i++) {
 		Image->RasterBits[i] = Translation[Image->RasterBits[i]];
@@ -371,17 +371,17 @@ SavedImage *GifMakeSavedImage(GifFileType *GifFile,
 			/* next, the raster */
 			sp->RasterBits = (unsigned char *)reallocarray(
 			    NULL,
-			    (CopyFrom->ImageDesc.Height *
-			     CopyFrom->ImageDesc.Width),
+			    (size_t)CopyFrom->ImageDesc.Height *
+			        CopyFrom->ImageDesc.Width,
 			    sizeof(GifPixelType));
 			if (sp->RasterBits == NULL) {
 				FreeLastSavedImage(GifFile);
 				return (SavedImage *)(NULL);
 			}
 			memcpy(sp->RasterBits, CopyFrom->RasterBits,
-			       sizeof(GifPixelType) *
-			           CopyFrom->ImageDesc.Height *
-			           CopyFrom->ImageDesc.Width);
+			       (size_t)CopyFrom->ImageDesc.Height *
+			           CopyFrom->ImageDesc.Width *
+			           sizeof(GifPixelType));
 
 			/* finally, the extension blocks */
 			if (CopyFrom->ExtensionBlocks != NULL) {
