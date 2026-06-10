@@ -114,6 +114,10 @@ ColorMapObject *GifUnionColorMap(const ColorMapObject *ColorIn1,
 	int i, j, CrntSlot, RoundUpTo, NewGifBitSize;
 	ColorMapObject *ColorUnion;
 
+	if (ColorIn1 == NULL || ColorIn2 == NULL) {
+		return (NULL);
+	}
+
 	/*
 	 * We don't worry about duplicates within either color map; if
 	 * the caller wants to resolve those, he can perform unions
