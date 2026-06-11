@@ -1,5 +1,15 @@
 			GIFLIB NEWS
 
+Reposoitory head
+================
+
+Code fixes
+----------
+
+* Fix SF bug #203: giflib GifUnionColorMap NULL Pointer Dereference
+
+* Fix SF bug #199 Buffer Overflow vulnerability in giflib (CVE-2026-26740)
+
 Version 6.1.3
 =============
 
